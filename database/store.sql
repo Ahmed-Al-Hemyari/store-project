@@ -43,7 +43,7 @@ CREATE TABLE `orders` (
 CREATE TABLE `order_items` (
   `id` int NOT NULL COMMENT 'Primary Key',
   `order_id` int NOT NULL,
-  `product_id` int DEFAULT NULL,
+  `product_id` int NOT NULL,
   `quantity` bigint DEFAULT '1',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
