@@ -131,6 +131,23 @@ class Product {
         return self::find($id);
     }
 
+    public static function getAll() {
+        $data = create_query(type: 'SELECT', table: 'products');
+
+        if (!$data) return [];
+
+        return array_map(function($item) {
+            $product = new self();
+            $product->id          = (int) $item['id'];
+            $product->name        = $item['name'];
+            $product->description = $item['description'];
+            $product->price       = (float) $item['price'];
+            $product->image       = $item['image'];
+            $product->stock       = (int) $item['stock'];
+            return $product;
+        }, $data);
+    }
+
     public static function find(int $id) {
         $data = create_query(type: 'SELECT', table: 'products', id: $id);
         if (!$data) return null;

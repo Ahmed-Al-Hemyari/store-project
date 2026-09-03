@@ -1,0 +1,205 @@
+<?php 
+
+require_once "../classes.php";
+
+session_start();
+
+$products = Product::getAll();
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Store</title>
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/customer/home.php">OnlineStore</a>
+            <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="nav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="/customer/home.php">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/customer/products.php">Products</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/customer/about.php">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/customer/contact.php">Contact</a></li>
+
+                        <?php if(isset($_SESSION['user'])) {?>
+                            <li class="nav-item"><a class="btn btn-primary" href="/customer/profile.php">Profile</a></li>
+                        <?php } else { ?>
+                            <li class="nav-item"><a class="btn btn-primary" href="/auth/login.php">Login</a></li>
+                        <?php } ?>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="page-hero text-white text-center" 
+        style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/images/background.jpg');"
+        >
+        <div class="container">
+            <h1 class="display-4 fw-bold">Welcome to OnlineStore</h1>
+            <p class="lead">Everything you need, delivered to your door</p>
+            <a href="/customer/products.php" class="btn btn-warning btn-lg">Shop Now</a>
+        </div>
+    </section>
+    
+    <!-- Why Choose Us -->
+    <section class="py-5">
+        <div class="container text-center">
+            <h2 class="mb-4">Why Choose OnlineStore?</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h5>🚚 Fast Delivery</h5>
+                    <p>Quick and safe shipping for all orders</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>💰 Best Prices</h5>
+                    <p>Affordable products with great value</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>⭐ Trusted Quality</h5>
+                    <p>Only high-quality and verified products</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products -->
+    <section class="bg-light py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Featured Products</h2>
+            <div class="row g-4">
+
+                <?php 
+                $len = 4 > count($products) ? count($products) : 4;
+                for ($i=0; $i < $len; $i++) { ?>            
+                    <div class="col-6 col-md-4 col-lg-3 mb-4">
+                        <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden product-card transition-all">
+                            <!-- Image Container with Aspect Ratio -->
+                            <div class="ratio ratio-4x3 bg-light overflow-hidden position-relative">
+                                <img 
+                                    src="<?= htmlspecialchars($products[$i]->image ?? '/images/default.png'); ?>" 
+                                    class="card-img-top object-fit-cover w-100 h-100" 
+                                    alt="<?= htmlspecialchars($products[$i]->name); ?>" 
+                                    loading="lazy"
+                                >
+                            </div>
+
+                            <!-- Card Body -->
+                            <div class="card-body d-flex flex-column justify-content-between p-3 text-center">
+                                <div>
+                                    <h6 class="card-title text-truncate fw-semibold mb-2" title="<?= htmlspecialchars($products[$i]->name); ?>">
+                                        <?= htmlspecialchars($products[$i]->name); ?>
+                                    </h6>
+                                    <p class="card-text text-primary fs-5 fw-bold mb-3">
+                                        $<?= number_format($products[$i]->price, 2); ?>
+                                    </p>
+                                </div>
+                                
+                                <a href="products/phones.html" class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-medium">
+                                    Add to Cart
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <?php  } ?>
+
+    
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Offer -->
+    <section class="bg-secondary text-white py-5 text-center">
+            <div class="container">
+                <h2>Special Offer!</h2>
+                <p>Get up to 30% off on selected products</p>
+                <a href="/customer/products.php" class="btn btn-warning">Shop Deals</a>
+            </div>
+        </section>
+        
+        <!-- Testimonials -->
+        <section class="py-5">
+            <div class="container text-center">
+                <h2 class="mb-4">What Our Customers Say</h2>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <blockquote>"Great products and fast delivery!"</blockquote>
+                        <p class="fw-bold">– Sarah</p>
+                    </div>
+                    <div class="col-md-4">
+                        <blockquote>"Affordable prices and good quality."</blockquote>
+                        <p class="fw-bold">– Ahmed</p>
+                    </div>
+                    <div class="col-md-4">
+                        <blockquote>"Excellent customer service."</blockquote>
+                        <p class="fw-bold">– John</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Newsletter -->
+        <section class="bg-light py-5">
+            <div class="container text-center">
+                <h2>Subscribe to Our Newsletter</h2>
+                <p>Get updates about new products and offers</p>
+                <div class="row justify-content-center">
+                    <div class="col-md-4">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-dark text-white pt-5 pb-3">
+        <div class="container">
+            <div class="row">
+                <!-- About -->
+                <div class="col-md-4 mb-4 text-start">
+                    <h5 class="fw-bold">OnlineStore</h5>
+                    <p class="text-white" style="font-size: 0.9rem;">
+                        A modern e-commerce platform focused on quality, affordability, and customer satisfaction.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="col-md-4 mb-4 text-center">
+                    <h5 class="fw-bold">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/customer/home.php" class="text-white text-decoration-none">Home</a></li>
+                        <li><a href="/customer/products.php" class="text-white text-decoration-none">Shop</a></li>
+                        <li><a href="/customer/about.php" class="text-white text-decoration-none">About</a></li>
+                        <li><a href="/customer/contact.php" class="text-white text-decoration-none">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="col-md-4 mb-4 text-start">
+                    <h5 class="fw-bold">Contact</h5>
+                    <p class="text-white mb-1">Email: support@onlinestore.com</p>
+                    <p class="text-white mb-1">Phone: +123 456 789</p>
+                    <p class="text-white">Address: Main Street, City</p>
+                </div>
+            </div>
+
+            <hr class="bg-secondary">
+
+            <p class="mb-0 text-center text-white" style="font-size: 0.9rem;">
+                © 2026 OnlineStore. All rights reserved.
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

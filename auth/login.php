@@ -29,10 +29,11 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 
         if (password_verify($password, $user['password'])) {
             // Store user info in session
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['name']    = $user['name'];
-            $_SESSION['email']   = $user['email'];
-            $_SESSION['phone']   = $user['phone'];
+            $_SESSION['user']['id'] = $user['id'];
+            $_SESSION['user']['name'] = $user['name'];
+            $_SESSION['user']['email'] = $user['email'];
+            $_SESSION['user']['phone'] = $user['phone'];
+            $_SESSION['user']['admin'] = (bool) $user['admin'];
 
             header("Location: /");
             exit();

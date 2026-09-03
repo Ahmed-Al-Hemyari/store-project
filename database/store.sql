@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Sep 03, 2026 at 04:14 PM
+-- Generation Time: Sep 03, 2026 at 06:34 PM
 -- Server version: 9.6.0
 -- PHP Version: 8.3.30
 
@@ -34,6 +34,15 @@ CREATE TABLE `orders` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`id`, `user_id`, `status`, `created_at`) VALUES
+(1, 2, 'completed', '2026-09-03 19:15:00'),
+(2, 3, 'progress', '2026-09-03 19:16:00'),
+(3, 2, 'pending', '2026-09-03 19:17:00');
+
 -- --------------------------------------------------------
 
 --
@@ -48,6 +57,16 @@ CREATE TABLE `order_items` (
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `order_items`
+--
+
+INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `created_at`) VALUES
+(1, 1, 1, 2, '2026-09-03 19:15:05'),
+(2, 1, 2, 1, '2026-09-03 19:15:05'),
+(3, 2, 3, 1, '2026-09-03 19:16:05'),
+(4, 3, 1, 1, '2026-09-03 19:17:05');
+
 -- --------------------------------------------------------
 
 --
@@ -56,13 +75,22 @@ CREATE TABLE `order_items` (
 
 CREATE TABLE `products` (
   `id` int NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `description` longtext COLLATE utf8mb4_general_ci,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `price` double NOT NULL,
-  `image` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `stock` bigint DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `products`
+--
+
+INSERT INTO `products` (`id`, `name`, `description`, `price`, `image`, `stock`, `created_at`) VALUES
+(1, 'Wireless Ergonomic Mouse', 'High-precision wireless optical mouse with ergonomic design.', 29.99, '/images/mouse.jpg', 50, '2026-09-03 19:14:00'),
+(2, 'Mechanical Gaming Keyboard', 'RGB backlit mechanical keyboard with tactile blue switches.', 79.99, '/images/keyboard.jpg', 30, '2026-09-03 19:14:00'),
+(3, '27-Inch 4K Monitor', 'Ultra HD LED monitor with high color accuracy.', 349.5, '/images/monitor.jpg', 15, '2026-09-03 19:14:00');
 
 -- --------------------------------------------------------
 
@@ -72,10 +100,10 @@ CREATE TABLE `products` (
 
 CREATE TABLE `users` (
   `id` int NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `phone` varchar(15) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `phone` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `admin` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -88,34 +116,6 @@ INSERT INTO `users` (`id`, `name`, `email`, `phone`, `password`, `admin`, `creat
 (1, 'admin', 'admin@gmail.com', '', '$2y$10$.yIHKHJNje2aHfL2GruclOGRZSRRqVXHvx5UTzhneCjSFMdAxDkla', 1, '2026-09-03 19:12:29'),
 (2, 'customer1', 'customer1@gmail.com', '', '$2y$10$mxSj.dpTIu/AB0JEy15C4uEDG5QUhs0UgoIm./IAaiyNJuu3stGZS', 0, '2026-09-03 19:12:58'),
 (3, 'customer2', 'customer2@gmail.com', '', '$2y$10$xUYiRiOqNVWppYkCt1U1vevFkIKeLgCzUieU7nzn5cD7vI4f10leK', 0, '2026-09-03 19:13:06');
-
---
--- Dumping data for table `products`
---
-
-INSERT INTO `products` (`id`, `name`, `description`, `price`, `image`, `stock`, `created_at`) VALUES
-(1, 'Wireless Ergonomic Mouse', 'High-precision wireless optical mouse with ergonomic design.', 29.99, 'mouse.jpg', 50, '2026-09-03 19:14:00'),
-(2, 'Mechanical Gaming Keyboard', 'RGB backlit mechanical keyboard with tactile blue switches.', 79.99, 'keyboard.jpg', 30, '2026-09-03 19:14:00'),
-(3, '27-Inch 4K Monitor', 'Ultra HD LED monitor with high color accuracy.', 349.50, 'monitor.jpg', 15, '2026-09-03 19:14:00');
-
---
--- Dumping data for table `orders`
---
-
-INSERT INTO `orders` (`id`, `user_id`, `status`, `created_at`) VALUES
-(1, 2, 'completed', '2026-09-03 19:15:00'),
-(2, 3, 'progress', '2026-09-03 19:16:00'),
-(3, 2, 'pending', '2026-09-03 19:17:00');
-
---
--- Dumping data for table `order_items`
---
-
-INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `created_at`) VALUES
-(1, 1, 1, 2, '2026-09-03 19:15:05'),
-(2, 1, 2, 1, '2026-09-03 19:15:05'),
-(3, 2, 3, 1, '2026-09-03 19:16:05'),
-(4, 3, 1, 1, '2026-09-03 19:17:05');
 
 --
 -- Indexes for dumped tables
