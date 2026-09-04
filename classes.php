@@ -2,7 +2,7 @@
 
 require __DIR__ . "/database/connection.php";
 
-function create_query(string $type, string $table, ?array $data = [], mixed $id = null, ?string $email = null, ?int $user_id = null) {
+function create_query(string $type, string $table, ?array $data = [], mixed $id = null, ?string $email = null, ?int $user_id = null, ?int $order_id = null) {
     global $connection;
     $data = array_map(fn($v) => is_bool($v) ? (int)$v : $v, $data ?? []);
 
@@ -16,7 +16,8 @@ function create_query(string $type, string $table, ?array $data = [], mixed $id 
         case 'SELECT':
             if ($id) return mysqli_fetch_assoc(mysqli_execute_query($connection, "SELECT * FROM `{$table}` WHERE `id` = ?", [$id]));
             if ($email) return mysqli_fetch_assoc(mysqli_execute_query($connection, "SELECT * FROM `{$table}` WHERE `email` = ?", [$email]));
-            if ($user_id) return mysqli_fetch_assoc(mysqli_execute_query($connection, "SELECT * FROM `{$table}` WHERE `user_id` = ?", [$user_id]));
+            if ($user_id) return mysqli_fetch_all(mysqli_execute_query($connection, "SELECT * FROM `{$table}` WHERE `user_id` = ?", [$user_id]), MYSQLI_ASSOC);
+            if ($order_id) return mysqli_fetch_all(mysqli_execute_query($connection, "SELECT * FROM `{$table}` WHERE `order_id` = ?", [$order_id]), MYSQLI_ASSOC);
             return mysqli_fetch_all(mysqli_query($connection, "SELECT * FROM `{$table}`"), MYSQLI_ASSOC);
 
         case 'UPDATE':
@@ -172,7 +173,10 @@ class Order {
     public ?int $id;
     public int $user_id;
     public ?string $status;
+    public ?int $itemsCount;
+    public ?float $totalPrice;
     public User $user;
+    public array $orderItems = [];
 
     public static function create(?int $user_id, ?string $status = 'pending') {
         $user = User::find($user_id);
@@ -196,23 +200,46 @@ class Order {
         $order = new self();
         $order->id = (int) $data['id'];
         $order->user_id = (int) $data['user_id'];
+        $order->status = $data['status'];
 
         $order->user = User::find($order->user_id);
-        $order->status = $data['status'];
+
+        $order->orderItems = OrderItem::getOrderItems($order->id);
+
+        $order->itemsCount = count($order->orderItems);
+
+        $order->totalPrice = 0;
+        foreach ($order->orderItems as $orderItem) {
+            $price = $orderItem->quantity * $orderItem->product->price;
+            $order->totalPrice += $price;
+        }
 
         return $order;
     }
 
     public static function getUserOrders() {
-        session_start();
-        $data = create_query(type: 'SELECT', table: 'orders', user_id: $_SESSION['user']['id']);
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $data = create_query(type: 'SELECT', table: 'orders', user_id: (int)$_SESSION['user']['id']);
 
         if (!$data) return [];
 
+        
         return array_map(function($item) {
             $order = new self();
             $order->id = (int) $item['id'];
             $order->status = $item['status'];
+            $orderItems = OrderItem::getOrderItems($order->id);
+
+            $order->itemsCount = count($orderItems);
+
+            $order->totalPrice = 0;
+            foreach ($orderItems as $orderItem) {
+                $price = $orderItem->quantity * $orderItem->product->price;
+                $order->totalPrice += $price;
+            }
+
             return $order;
         }, $data);
     }
@@ -275,6 +302,24 @@ class OrderItem {
 
         return self::find($id);
     }
+
+    public static function getOrderItems(int $order_id) {
+        $data = create_query(type: 'SELECT', table: 'order_items', order_id: $order_id);
+
+        if (!$data) return [];
+
+        
+        return array_map(function($item) {
+            $orderItem = new self();
+            $orderItem->id = (int) $item['id'];
+            $orderItem->product_id = $item['product_id'];
+            $orderItem->product = Product::find($orderItem->product_id);
+            $orderItem->quantity = $item['quantity'];
+
+            return $orderItem;
+        }, $data);
+    }
+
 
     public static function find(int $id) {
         $data = create_query(type: 'SELECT', table: 'order_items', id: $id);

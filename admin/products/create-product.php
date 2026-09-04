@@ -5,6 +5,7 @@ require_once "../../classes.php";
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['admin'] == false) {
     header("Location: /auth/login.php");
+    exit();
 }
 
 ?>

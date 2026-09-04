@@ -5,6 +5,7 @@ session_start();
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['admin'] == false) {
     header("Location: /auth/login.php");
+    exit();
 }
 
 ?>

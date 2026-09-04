@@ -1,7 +1,7 @@
 <?php
 
 function render_navbar(array $props = []): void {
-$activePage = $props['active'] ?? 'home';
+$activePage = $props['active'] ?? '';
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -23,7 +23,7 @@ $activePage = $props['active'] ?? 'home';
                         <li class="nav-item"><a class="btn btn-primary" href="/auth/login.php">Login</a></li>
                     <?php } ?>
                     
-                    <li class="nav-item"><a class="btn btn-success" href="/auth/cart.php">Cart</a></li>
+                    <li class="nav-item"><a class="btn btn-success" href="/customer/cart.php">Cart</a></li>
             </ul>
         </div>
     </div>
