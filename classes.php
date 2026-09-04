@@ -1,65 +1,31 @@
 <?php 
 
-require "../database/connection.php";
+require __DIR__ . "/database/connection.php";
 
-function create_query(string $type, string $table, ?array $data = [], mixed $id = null, ?string $email = null) {
+function create_query(string $type, string $table, ?array $data = [], mixed $id = null, ?string $email = null, ?int $user_id = null) {
     global $connection;
+    $data = array_map(fn($v) => is_bool($v) ? (int)$v : $v, $data ?? []);
 
     switch (strtoupper($type)) {
         case 'CREATE':
-            $columns = implode('`, `', array_keys($data));
+            $cols = implode('`, `', array_keys($data));
             $placeholders = implode(', ', array_fill(0, count($data), '?'));
-            
-            $stmt = mysqli_prepare($connection, "INSERT INTO `{$table}` (`{$columns}`) VALUES ({$placeholders})");
-            
-            $types = str_repeat('s', count($data));
-            // Convert booleans (true/false) to integers (1/0) safely
-            $values = array_map(fn($v) => is_bool($v) ? (int)$v : $v, array_values($data));
-            
-            mysqli_stmt_bind_param($stmt, $types, ...$values);
-            mysqli_stmt_execute($stmt);
+            mysqli_execute_query($connection, "INSERT INTO `{$table}` (`{$cols}`) VALUES ({$placeholders})", array_values($data));
             return mysqli_insert_id($connection);
 
         case 'SELECT':
-            if ($id) {
-                $stmt = mysqli_prepare($connection, "SELECT * FROM `{$table}` WHERE `id` = ?");
-                mysqli_stmt_bind_param($stmt, 'i', $id);
-                mysqli_stmt_execute($stmt);
-                
-                $result = mysqli_stmt_get_result($stmt);
-                return mysqli_fetch_assoc($result);
-            }
-
-            if ($email) {
-                $stmt = mysqli_prepare($connection, "SELECT * FROM `{$table}` WHERE `email` = ?");
-                mysqli_stmt_bind_param($stmt, 's', $email);
-                mysqli_stmt_execute($stmt);
-                
-                $result = mysqli_stmt_get_result($stmt);
-                return mysqli_fetch_assoc($result);
-            }
-
-            $result = mysqli_query($connection, "SELECT * FROM `{$table}`");
-            return mysqli_fetch_all($result, MYSQLI_ASSOC);
+            if ($id) return mysqli_fetch_assoc(mysqli_execute_query($connection, "SELECT * FROM `{$table}` WHERE `id` = ?", [$id]));
+            if ($email) return mysqli_fetch_assoc(mysqli_execute_query($connection, "SELECT * FROM `{$table}` WHERE `email` = ?", [$email]));
+            if ($user_id) return mysqli_fetch_assoc(mysqli_execute_query($connection, "SELECT * FROM `{$table}` WHERE `user_id` = ?", [$user_id]));
+            return mysqli_fetch_all(mysqli_query($connection, "SELECT * FROM `{$table}`"), MYSQLI_ASSOC);
 
         case 'UPDATE':
             if (empty($data)) return false;
-
             $sets = implode(' = ?, ', array_keys($data)) . ' = ?';
-            $values = array_map(fn($v) => is_bool($v) ? (int)$v : $v, array_values($data));
-            $values[] = $id;
-
-            $stmt = mysqli_prepare($connection, "UPDATE `{$table}` SET {$sets} WHERE `id` = ?");
-            
-            $types = str_repeat('s', count($data)) . 'i';
-            mysqli_stmt_bind_param($stmt, $types, ...$values);
-            
-            return mysqli_stmt_execute($stmt);
+            return (bool) mysqli_execute_query($connection, "UPDATE `{$table}` SET {$sets} WHERE `id` = ?", [...array_values($data), $id]);
 
         case 'DELETE':
-            $stmt = mysqli_prepare($connection, "DELETE FROM `{$table}` WHERE `id` = ?");
-            mysqli_stmt_bind_param($stmt, 'i', $id);
-            return mysqli_stmt_execute($stmt);
+            return (bool) mysqli_execute_query($connection, "DELETE FROM `{$table}` WHERE `id` = ?", [$id]);
     }
 }
 
@@ -78,6 +44,22 @@ class User {
         } else {
             return false;
         }
+    }
+
+    public static function getAll() {
+        $data = create_query(type: 'SELECT', table: 'users');
+
+        if (!$data) return [];
+
+        return array_map(function($item) {
+            $user = new self();
+            $user->id = (int) $item['id'];
+            $user->name = $item['name'];
+            $user->email = $item['email'];
+            $user->phone = $item['phone'];
+            $user->admin = (bool) $item['admin'];
+            return $user;
+        }, $data);
     }
 
     public static function create(string $name, string $email, ?string $phone, string $password) {
@@ -219,6 +201,20 @@ class Order {
         $order->status = $data['status'];
 
         return $order;
+    }
+
+    public static function getUserOrders() {
+        session_start();
+        $data = create_query(type: 'SELECT', table: 'orders', user_id: $_SESSION['user']['id']);
+
+        if (!$data) return [];
+
+        return array_map(function($item) {
+            $order = new self();
+            $order->id = (int) $item['id'];
+            $order->status = $item['status'];
+            return $order;
+        }, $data);
     }
 
     public function update(?string $user_id = null, ?string $status = null) {

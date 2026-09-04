@@ -15,22 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     $phone = htmlspecialchars(trim($_POST['phone'] ?? ''));
     $password = htmlspecialchars(trim($_POST['password'] ?? ''));
 
-    // $check_stmt = mysqli_prepare($connection, "SELECT id FROM `users` WHERE `email` = ?");
-    // mysqli_stmt_bind_param($check_stmt, "s", $email);
-    // mysqli_stmt_execute($check_stmt);
-    // mysqli_stmt_store_result($check_stmt);
-    
-    // if (mysqli_stmt_num_rows($check_stmt) > 0) {
-    //     $email_error = "Email is already used!";
-
     if (User::checkEmailIfExist($email)) {
         $email_error = "Email is already used!";
     } else {
-        // $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-        // $insert_stmt = mysqli_prepare($connection, "INSERT INTO `users` (`name`, `email`, `phone`, `password`) VALUES (?, ?, ?, ?)");
-        // mysqli_stmt_bind_param($insert_stmt, "ssss", $name, $email, $phone, $hashed_password);
-
         $user = User::create($name, $email, $phone, $password);
     
         if ($user) {

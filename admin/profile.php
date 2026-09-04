@@ -1,7 +1,9 @@
 <?php
-require_once "../components/navbar.php";
+require_once "./components/navbar.php";
 
-if (!isset($_SESSION['user'])) {
+session_start();
+
+if (!isset($_SESSION['user']) || $_SESSION['user']['admin'] == false) {
     header("Location: /auth/login.php");
 }
 
