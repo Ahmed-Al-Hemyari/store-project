@@ -19,6 +19,7 @@ $activePage = $props['active'] ?? '';
 
                     <?php if(isset($_SESSION['user'])) {?>
                         <li class="nav-item"><a class="btn btn-primary" href="/customer/profile.php">Profile</a></li>
+                        <li class="nav-item"><a class="btn btn-danger" href="/auth/logout.php">Logout</a></li>
                     <?php } else { ?>
                         <li class="nav-item"><a class="btn btn-primary" href="/auth/login.php">Login</a></li>
                     <?php } ?>

@@ -1,7 +1,7 @@
 <?php
 
 function render_navbar(array $props = []): void {
-$activePage = $props['active'] ?? 'users';
+$activePage = $props['active'] ?? '';
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -15,6 +15,7 @@ $activePage = $props['active'] ?? 'users';
                 <li class="nav-item"><a class="nav-link <?= $activePage == 'users' ? 'active' : ''; ?>" href="/admin/users/users-table.php" id="users">Users</a></li>
                 <li class="nav-item"><a class="nav-link <?= $activePage == 'products' ? 'active' : ''; ?>" href="/admin/products/products-table.php" id="products">Products</a></li>
                 <li class="nav-item"><a class="btn btn-primary" href="/admin/profile.php">Profile</a></li>
+                <li class="nav-item"><a class="btn btn-danger" href="/auth/logout.php">Logout</a></li>
             </ul>
         </div>
     </div>
