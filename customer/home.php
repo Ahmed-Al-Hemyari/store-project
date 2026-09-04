@@ -1,6 +1,7 @@
 <?php 
 
 require_once "../classes.php";
+require_once "../components/navbar.php";
 
 session_start();
 
@@ -19,28 +20,7 @@ $products = Product::getAll();
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/customer/home.php">OnlineStore</a>
-            <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="nav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link active" href="/customer/home.php">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/customer/products.php">Products</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/customer/about.php">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/customer/contact.php">Contact</a></li>
-
-                        <?php if(isset($_SESSION['user'])) {?>
-                            <li class="nav-item"><a class="btn btn-primary" href="/customer/profile.php">Profile</a></li>
-                        <?php } else { ?>
-                            <li class="nav-item"><a class="btn btn-primary" href="/auth/login.php">Login</a></li>
-                        <?php } ?>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <?php render_navbar(['active' => 'home']); ?>
 
     <!-- Hero -->
     <section class="page-hero text-white text-center" 
