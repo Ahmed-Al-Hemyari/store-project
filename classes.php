@@ -2,34 +2,6 @@
 
 require __DIR__ . "/database/connection.php";
 
-function create_query(string $type, string $table, ?array $data = [], mixed $id = null, ?string $email = null, ?int $user_id = null, ?int $order_id = null) {
-    global $connection;
-    $data = array_map(fn($v) => is_bool($v) ? (int)$v : $v, $data ?? []);
-
-    switch (strtoupper($type)) {
-        case 'CREATE':
-            $cols = implode('`, `', array_keys($data));
-            $placeholders = implode(', ', array_fill(0, count($data), '?'));
-            mysqli_execute_query($connection, "INSERT INTO `{$table}` (`{$cols}`) VALUES ({$placeholders})", array_values($data));
-            return mysqli_insert_id($connection);
-
-        case 'SELECT':
-            if ($id) return mysqli_fetch_assoc(mysqli_execute_query($connection, "SELECT * FROM `{$table}` WHERE `id` = ?", [$id]));
-            if ($email) return mysqli_fetch_assoc(mysqli_execute_query($connection, "SELECT * FROM `{$table}` WHERE `email` = ?", [$email]));
-            if ($user_id) return mysqli_fetch_all(mysqli_execute_query($connection, "SELECT * FROM `{$table}` WHERE `user_id` = ?", [$user_id]), MYSQLI_ASSOC);
-            if ($order_id) return mysqli_fetch_all(mysqli_execute_query($connection, "SELECT * FROM `{$table}` WHERE `order_id` = ?", [$order_id]), MYSQLI_ASSOC);
-            return mysqli_fetch_all(mysqli_query($connection, "SELECT * FROM `{$table}`"), MYSQLI_ASSOC);
-
-        case 'UPDATE':
-            if (empty($data)) return false;
-            $sets = implode(' = ?, ', array_keys($data)) . ' = ?';
-            return (bool) mysqli_execute_query($connection, "UPDATE `{$table}` SET {$sets} WHERE `id` = ?", [...array_values($data), $id]);
-
-        case 'DELETE':
-            return (bool) mysqli_execute_query($connection, "DELETE FROM `{$table}` WHERE `id` = ?", [$id]);
-    }
-}
-
 class User {
     public ?int $id;
     public string $name;
@@ -38,17 +10,20 @@ class User {
     public string $password;
     public bool $admin = false;
 
-    public static function checkEmailIfExist(string $email) : bool {
-        $user = create_query(type: 'SELECT', table: 'users', email: $email);
-        if ($user) {
-            return true;
-        } else {
-            return false;
-        }
+    public static function checkEmailIfExist(string $email): bool {
+        global $connection;
+        $query = "SELECT 1 FROM `users` WHERE `email` = :email LIMIT 1";
+        $statement = $connection->prepare($query);
+        $statement->execute([':email' => $email]);
+
+        return (bool) $statement->fetch();
     }
 
-    public static function getAll() {
-        $data = create_query(type: 'SELECT', table: 'users');
+    public static function getAll(): array {
+        global $connection;
+        $query = "SELECT * FROM `users`";
+        $statement = $connection->query($query);
+        $data = $statement->fetchAll();
 
         if (!$data) return [];
 
@@ -63,34 +38,66 @@ class User {
         }, $data);
     }
 
-    public static function create(string $name, string $email, ?string $phone, string $password) {
-        $id = create_query(type: 'CREATE', table: 'users', data: [
-            'name' => $name,
-            'email' => $email,
-            'phone' => $phone,
-            'password' => password_hash($password, PASSWORD_DEFAULT)
+    public static function create(string $name, string $email, ?string $phone, string $password): ?User {
+        global $connection;
+        $query = "INSERT INTO `users` (`name`, `email`, `phone`, `password`) VALUES (:name, :email, :phone, :password)";
+        $statement = $connection->prepare($query);
+        $statement->execute([
+            ':name' => $name,
+            ':email' => $email,
+            ':phone' => $phone,
+            ':password' => password_hash($password, PASSWORD_DEFAULT),
         ]);
 
+        $id = (int) $connection->lastInsertId();
         return self::find($id);
     }
 
-    public static function find(int $id) {
-        $data = create_query(type: 'SELECT', table: 'users', id: $id);
+    public static function find(int $id): ?User {
+        global $connection;
+        $query = "SELECT * FROM `users` WHERE `id` = :id";
+        $statement = $connection->prepare($query);
+        $statement->execute([':id' => $id]);
+        $data = $statement->fetch();
+
         if (!$data) return null;
 
         $user = new self();
-        $user->id = (int)$data['id'];
+        $user->id = (int) $data['id'];
         $user->name = $data['name'];
         $user->email = $data['email'];
         $user->phone = $data['phone'];
+        $user->admin = (bool) $data['admin'];
         return $user;
     }
 
-    public function delete() {
-        if ($this->id) {
-            return create_query(type: 'DELETE', table: 'users', id: $this->id);
-        }
-        return false;
+    public static function findByEmail(string $email): ?User {
+        global $connection;
+        $query = "SELECT * FROM `users` WHERE `email` = :email";
+        $statement = $connection->prepare($query);
+        $statement->execute([':email' => $email]);
+
+        $data = $statement->fetch();
+
+        if (!$data) return null;
+
+        $user = new self();
+        $user->id = (int) $data['id'];
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        $user->phone = $data['phone'];
+        $user->admin = (bool) $data['admin'];
+        $user->password = $data['password'];
+        return $user;
+    }
+
+    public function delete(): bool {
+        global $connection;
+        if (!$this->id) return false;
+
+        $query = "DELETE FROM `users` WHERE `id` = :id";
+        $statement = $connection->prepare($query);
+        return $statement->execute([':id' => $this->id]);
     }
 }
 
@@ -102,37 +109,49 @@ class Product {
     public ?string $image;
     public int $stock = 1;
 
-    public static function create(string $name, ?string $description, float $price, ?string $image, int $stock = 1) {
-        $id = create_query(type: 'CREATE', table: 'products', data: [
-            'name' => $name,
-            'description' => $description,
-            'price' => $price,
-            'image' => $image,
-            'stock' => $stock
+    public static function create(string $name, ?string $description, float $price, ?string $image, int $stock = 1): ?Product {
+        global $connection;
+        $query = "INSERT INTO `products` (`name`, `description`, `price`, `image`, `stock`) VALUES (:name, :description, :price, :image, :stock)";
+        $statement = $connection->prepare($query);
+        $statement->execute([
+            ':name' => $name,
+            ':description' => $description,
+            ':price' => $price,
+            ':image' => $image,
+            ':stock' => $stock,
         ]);
 
+        $id = (int) $connection->lastInsertId();
         return self::find($id);
     }
 
     public static function getAll() {
-        $data = create_query(type: 'SELECT', table: 'products');
+        global $connection;
+        $query = "SELECT * FROM `products`";
+        $statement = $connection->query($query);
+        $data = $statement->fetchAll();
 
         if (!$data) return [];
 
         return array_map(function($item) {
             $product = new self();
-            $product->id          = (int) $item['id'];
-            $product->name        = $item['name'];
+            $product->id = (int) $item['id'];
+            $product->name = $item['name'];
             $product->description = $item['description'];
-            $product->price       = (float) $item['price'];
-            $product->image       = $item['image'];
-            $product->stock       = (int) $item['stock'];
+            $product->price = (float) $item['price'];
+            $product->image = $item['image'];
+            $product->stock = (int) $item['stock'];
             return $product;
         }, $data);
     }
 
     public static function find(int $id) {
-        $data = create_query(type: 'SELECT', table: 'products', id: $id);
+        global $connection;
+        $query = "SELECT * FROM `products` WHERE `id` = :id";
+        $statement = $connection->prepare($query);
+        $statement->execute([':id' => $id]);
+        $data = $statement->fetch();
+
         if (!$data) return null;
 
         $product = new self();
@@ -147,25 +166,50 @@ class Product {
     }
 
     public function update(?string $name = null, ?string $description = null, ?float $price = null, ?string $image = null, ?int $stock = null) {
+        global $connection;
+        if (!$this->id) return false;
 
-        $data = [];
-        if (!is_null($name)) $data['name'] = $name;
-        if (!is_null($description)) $data['description'] = $description;
-        if (!is_null($price)) $data['price'] = $price;
-        if (!is_null($image)) $data['image'] = $image;
-        if (!is_null($stock)) $data['stock'] = $stock;
+        $name = $name ?? $this->name;
+        $description = $description ?? $this->description;
+        $price = $price ?? $this->price;
+        $image = $image ?? $this->image;
+        $stock = $stock ?? $this->stock;
+        
+        $query = "UPDATE `products` SET 
+            `id` = :id,
+            `name` = :name,
+            `description` = :description,
+            `price` = :price,
+            `image` = :image,
+            `stock` = :stock WHERE `id` = :id";
+        $statement = $connection->prepare($query);
+        $success = $statement->execute([
+            ':id' => $this->id,
+            ':name' => $name,
+            ':description' => $description,
+            ':price' => $price,
+            ':image' => $image,
+            ':stock' => $stock,
+        ]);
 
-        if (!$data) {
-            return false;
+        if ($success) {
+            $this->name = $name;
+            $this->description = $description;
+            $this->price = $price;
+            $this->image = $image;
+            $this->stock = $stock;
         }
-        return create_query(type: 'UPDATE', table: 'products', data: $data, id: $this->id);
+
+        return $success;
     }
 
     public function delete() {
-        if ($this->id) {
-            return create_query(type: 'DELETE', table: 'products', id: $this->id);
-        }
-        return false;
+        global $connection;
+        if (!$this->id) return false;
+
+        $query = "DELETE FROM `products` WHERE `id` = :id";
+        $statement = $connection->prepare($query);
+        return $statement->execute([':id' => $this->id]);
     }
 }
 
@@ -185,16 +229,24 @@ class Order {
             return false;
         }
 
-        $id = create_query(type: 'CREATE', table: 'orders', data: [
-            'user_id' => $user->id,
-            'status' => $status
+        global $connection;
+        $query = "INSERT INTO `order` (`user_id`, `status`) VALUES (:user_id, :status)";
+        $statement = $connection->prepare($query);
+        $statement->execute([
+            ':user_id' => $user->id,
+            ':status' => $status,
         ]);
 
+        $id = (int) $connection->lastInsertId();
         return self::find($id);
     }
 
     public static function find(int $id) {
-        $data = create_query(type: 'SELECT', table: 'orders', id: $id);
+        global $connection;
+        $query = "SELECT * FROM `orders` WHERE `id` = :id";
+        $statement = $connection->prepare($query);
+        $statement->execute([':id' => $id]);
+        $data = $statement->fetch();
         if (!$data) return null;
 
         $order = new self();
@@ -202,12 +254,12 @@ class Order {
         $order->user_id = (int) $data['user_id'];
         $order->status = $data['status'];
 
+        // Foreign
         $order->user = User::find($order->user_id);
-
         $order->orderItems = OrderItem::getOrderItems($order->id);
 
+        // Auto counted variables
         $order->itemsCount = count($order->orderItems);
-
         $order->totalPrice = 0;
         foreach ($order->orderItems as $orderItem) {
             $price = $orderItem->quantity * $orderItem->product->price;
@@ -221,7 +273,12 @@ class Order {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        $data = create_query(type: 'SELECT', table: 'orders', user_id: (int)$_SESSION['user']['id']);
+
+        global $connection;
+        $user_id = (int) $_SESSION['user']['id'];
+        $query = "SELECT * FROM `orders` WHERE `user_id` = $user_id";
+        $statement = $connection->query($query);
+        $data = $statement->fetchAll();
 
         if (!$data) return [];
 
@@ -229,13 +286,17 @@ class Order {
         return array_map(function($item) {
             $order = new self();
             $order->id = (int) $item['id'];
+            $order->user_id = (int) $item['user_id'];
             $order->status = $item['status'];
-            $orderItems = OrderItem::getOrderItems($order->id);
+            
+            // Foreign
+            $order->user = User::find($order->user_id);
+            $order->orderItems = OrderItem::getOrderItems($order->id);
 
-            $order->itemsCount = count($orderItems);
-
+            // Auto counted variables
+            $order->itemsCount = count($order->orderItems);
             $order->totalPrice = 0;
-            foreach ($orderItems as $orderItem) {
+            foreach ($order->orderItems as $orderItem) {
                 $price = $orderItem->quantity * $orderItem->product->price;
                 $order->totalPrice += $price;
             }
@@ -245,32 +306,47 @@ class Order {
     }
 
     public function update(?string $user_id = null, ?string $status = null) {
-        $data = [];
+        global $connection;
+        if (!$this->id) return false;
 
-        if (!is_null($user_id)) {
-            $user = User::find($user_id);
-            if (!$user) {
-                return false;
+        $user_id = $user_id ?? $this->user_id;
+        $status = $status ?? $this->status;
+        
+        $query = "UPDATE `orders` SET 
+            `id` = :id,
+            `user_id` = :user_id,
+            `status` = :status WHERE `id` = :id";
+        $statement = $connection->prepare($query);
+        $success = $statement->execute([
+            ':id' => $this->id,
+            ':user_id' => $user_id,
+            ':status' => $status,
+        ]);
+
+        if ($success) {
+            $this->user_id = $user_id;
+            $this->status = $status;
+            $this->user = User::find($this->user_id);
+            $this->orderItems = OrderItem::getOrderItems($this->id);
+
+            $this->itemsCount = count($this->orderItems);
+            $this->totalPrice = 0;
+            foreach ($this->orderItems as $orderItem) {
+                $price = $orderItem->quantity * $orderItem->product->price;
+                $this->totalPrice += $price;
             }
-            $data['user_id'] = $user_id;
         }
 
-        if (!is_null($status)) {
-            $data['status'] = $status;
-        }
-
-        if (empty($data)) {
-            return false;
-        }
-
-        return create_query(type: 'UPDATE', table: 'orders', data: $data, id: $this->id);
+        return $success;
     }
 
     public function delete() {
-        if ($this->id) {
-            return create_query(type: 'DELETE', table: 'orders', id: $this->id);
-        }
-        return;
+        global $connection;
+        if (!$this->id) return false;
+
+        $query = "DELETE FROM `orders` WHERE `id` = :id";
+        $statement = $connection->prepare($query);
+        return $statement->execute([':id' => $this->id]);
     }
 }
 
@@ -294,20 +370,26 @@ class OrderItem {
             return false;
         }
 
-        $id = create_query(type: 'CREATE', table: 'order_items', data: [
-            'order_id' => $order->id,
-            'product_id' => $product->id,
-            'quantity' => $quantity
+        global $connection;
+        $query = "INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`) VALUES (:order_id, :product_id, :quantity)";
+        $statement = $connection->prepare($query);
+        $statement->execute([
+            ':order_id' => $order->id,
+            ':product_id' => $product->id,
+            ':quantity' => $quantity,
         ]);
 
+        $id = (int) $connection->lastInsertId();
         return self::find($id);
     }
 
     public static function getOrderItems(int $order_id) {
-        $data = create_query(type: 'SELECT', table: 'order_items', order_id: $order_id);
+        global $connection;
+        $query = "SELECT * FROM `order_items` WHERE `order_id` = $order_id";
+        $statement = $connection->query($query);
+        $data = $statement->fetchAll();
 
         if (!$data) return [];
-
         
         return array_map(function($item) {
             $orderItem = new self();
@@ -322,8 +404,13 @@ class OrderItem {
 
 
     public static function find(int $id) {
-        $data = create_query(type: 'SELECT', table: 'order_items', id: $id);
-        if (!$data) return false;
+        global $connection;
+        $query = "SELECT * FROM `order_items` WHERE `id` = :id";
+        $statement = $connection->prepare($query);
+        $statement->execute([':id' => $id]);
+        $data = $statement->fetch();
+
+        if (!$data) return null;
 
         $orderItem = new self();
         $orderItem->id = (int) $data['id'];
@@ -338,39 +425,43 @@ class OrderItem {
     }
 
     public function update(?int $order_id = null, ?int $product_id = null, ?int $quantity = null) {
-        $data = [];
+        global $connection;
+        if (!$this->id) return false;
 
-        if (!is_null($order_id)) {
-            $order = Order::find($order_id);
-            if (!$order) {
-                return false;
-            }
-            $data['order_id'] = $order_id;
+        $order_id = $order_id ?? $this->order_id;
+        $product_id = $product_id ?? $this->product_id;
+        $quantity = $quantity ?? $this->quantity;
+        
+        $query = "UPDATE `order_items` SET 
+            `id` = :id,
+            `order_id` = :order_id,
+            `product_id` = :product_id,
+            `quantity` = :quantity WHERE `id` = :id";
+        $statement = $connection->prepare($query);
+        $success = $statement->execute([
+            ':id' => $this->id,
+            ':order_id' => $order_id,
+            ':product_id' => $product_id,
+            ':quantity' => $quantity,
+        ]);
+
+        if ($success) {
+            $this->order_id = $order_id;
+            $this->product_id = $product_id;
+            $this->quantity = $quantity;
+            $this->order = Order::find($this->order_id);
+            $this->product = Product::find($this->product_id);
         }
 
-        if (!is_null($product_id)) {
-            $product = Product::find($product_id);
-            if (!$product) {
-                return false;
-            }
-            $data['product_id'] = $product_id;
-        }
-
-        if (!is_null($quantity)) {
-            $data['quantity'] = $quantity;
-        }
-
-        if (empty($data)) {
-            return false;
-        }
-
-        return create_query(type: 'UPDATE', table: 'order_items', data: $data, id: $this->id);
+        return $success;
     }
 
     public function delete() {
-        if ($this->id) {
-            return create_query(type: 'DELETE', table: 'order_items', id: $this->id);
-        }
-        return;
+        global $connection;
+        if (!$this->id) return false;
+
+        $query = "DELETE FROM `order_items` WHERE `id` = :id";
+        $statement = $connection->prepare($query);
+        return $statement->execute([':id' => $this->id]);
     }
 }

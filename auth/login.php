@@ -2,38 +2,30 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-session_start(); // Start session once at the top
+session_start();
 
 $error = "";
 $email_error = "";
 
 require "../database/connection.php";
+require "../classes.php";
 
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
-    // Standardize input extraction (do not use htmlspecialchars on database lookup strings)
     $email = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
-    $check_stmt = mysqli_prepare($connection, "SELECT * FROM `users` WHERE `email` = ?");
-    mysqli_stmt_bind_param($check_stmt, "s", $email);
-    mysqli_stmt_execute($check_stmt);
-    
-    // Get the result set from the prepared statement
-    $result = mysqli_stmt_get_result($check_stmt);
-    
-    // Check row count from $result, NOT $check_stmt
-    if (mysqli_num_rows($result) === 0) {
+    $user = User::checkEmailIfExist($email);
+    if (!$user) {
         $email_error = "Email doesn't exist, please register first!";
     } else {
-        $user = mysqli_fetch_assoc($result);
+        $user = User::findByEmail($email);
 
-        if (password_verify($password, $user['password'])) {
-            // Store user info in session
-            $_SESSION['user']['id'] = $user['id'];
-            $_SESSION['user']['name'] = $user['name'];
-            $_SESSION['user']['email'] = $user['email'];
-            $_SESSION['user']['phone'] = $user['phone'];
-            $_SESSION['user']['admin'] = (bool) $user['admin'];
+        if (password_verify($password, $user->password)) {
+            $_SESSION['user']['id'] = $user->id;
+            $_SESSION['user']['name'] = $user->name;
+            $_SESSION['user']['email'] = $user->email;
+            $_SESSION['user']['phone'] = $user->phone;
+            $_SESSION['user']['admin'] = (bool) $user->admin;
 
             header("Location: /");
             exit();

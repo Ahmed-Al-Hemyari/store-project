@@ -5,8 +5,11 @@ $user = "root";
 $password = "";
 $db = "store";
 
-$connection = mysqli_connect($host, $user, $password, $db);
-
-if (!$connection) {
-    die("Error connecting to Database");
+try {
+    $connection = new
+    PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $password);
+    $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // echo "Successfully connected to database";
+} catch (PDOException $e) {
+    echo "Failed to connect to database!" . $e->getMessage();
 }
