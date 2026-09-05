@@ -12,7 +12,7 @@ function render_order_card($order) {
 <div class="accordion-item border rounded-3 mb-3 overflow-hidden shadow-sm">
     <div class="d-flex align-items-center bg-white py-3 px-3 border-bottom-0">
         <!-- Main Card Body: Navigates to order details page -->
-        <a href="/customer/order-page.php?id=<?= $order->id; ?>" class="text-decoration-none d-flex justify-content-between align-items-center flex-grow-1 me-3">
+        <a href="/store-project/customer/order-page.php?id=<?= $order->id; ?>" class="text-decoration-none d-flex justify-content-between align-items-center flex-grow-1 me-3">
             <div>
                 <span class="fw-bold text-dark me-2">Order #<?= $order->id; ?></span>
                 <span class="badge <?= $statusClass; ?> rounded-pill px-2 py-1 text-capitalize">
@@ -46,7 +46,7 @@ function render_order_card($order) {
                         <div class="list-group-item d-flex justify-content-between align-items-center bg-white p-3">
                             <div class="d-flex align-items-center">
                                 <img 
-                                    src="<?= htmlspecialchars($item->product->image ?? '/images/default.png'); ?>" 
+                                    src="<?= htmlspecialchars($item->product->image ?? '/store-project/images/default.png'); ?>" 
                                     alt="<?= htmlspecialchars($item->product->name ?? 'Product'); ?>" 
                                     class="rounded border object-fit-cover me-3"
                                     style="width: 50px; height: 50px;"
@@ -73,7 +73,7 @@ function render_order_card($order) {
             <!-- Cancel Order Action -->
             <?php if (in_array($status, ['pending'])): ?>
                 <div class="d-flex justify-content-end border-top pt-3">
-                    <a href="/customer/cancel-order.php?id=<?= $order->id ?>" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                    <a href="/store-project/customer/cancel-order.php?id=<?= $order->id ?>" class="btn btn-sm btn-outline-danger rounded-pill px-3">
                         Cancel Order
                     </a>
                 </div>

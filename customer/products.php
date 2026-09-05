@@ -26,7 +26,7 @@ $products = Product::getAll();
         <?php render_navbar(['active' => 'products']); ?>
 
         <!-- Hero -->
-        <section class="page-hero text-center" style="background: linear-gradient(rgba(0,0,0,.6), rgba(0,0,0,.6)), url('/images/background-products.jpg');">
+        <section class="page-hero text-center" style="background: linear-gradient(rgba(0,0,0,.6), rgba(0,0,0,.6)), url('/store-project/images/background-products.jpg');">
             <h1 class="fw-bold">Our Products</h1>
             <p>Browse our best-selling items</p>
         </section>

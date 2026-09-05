@@ -14,12 +14,12 @@ $order = $orderId ? Order::find($orderId) : null;
 $sessionUserId = $_SESSION['user']['id'] ?? null;
 
 if (!$sessionUserId) {
-    header('Location: /auth/login.php');
+    header('Location: /store-project/auth/login.php');
     exit();
 }
 
 if ($order && (int)$order->user_id !== (int)$sessionUserId) {
-    header('Location: /customer/home.php');
+    header('Location: /store-project/customer/home.php');
     exit();
 }
 
@@ -59,13 +59,13 @@ $statusBadgeClass = match($status) {
                         <p class="text-muted m-0 small">Thank you for your purchase!</p>
                     </div>
                     <div>
-                        <a href="/customer/profile.php" class="btn btn-outline-secondary rounded-pill px-4 me-2">
+                        <a href="/store-project/customer/profile.php" class="btn btn-outline-secondary rounded-pill px-4 me-2">
                             My Orders
                         </a>
                         <button onclick="window.print();" class="btn btn-primary rounded-pill px-4">
                             Print Receipt
                         </button>
-                        <a href="/customer/cancel-order.php?id=<?= $order->id ?>" class="btn btn-outline-danger rounded-pill px-4 me-2">
+                        <a href="/store-project/customer/cancel-order.php?id=<?= $order->id ?>" class="btn btn-outline-danger rounded-pill px-4 me-2">
                             Cancel
                         </a>
                     </div>
@@ -96,7 +96,7 @@ $statusBadgeClass = match($status) {
                                                 <td class="ps-4">
                                                     <div class="d-flex align-items-center">
                                                         <img 
-                                                            src="<?= htmlspecialchars($item->product->image ?? '/images/default.png'); ?>" 
+                                                            src="<?= htmlspecialchars($item->product->image ?? '/store-project/images/default.png'); ?>" 
                                                             alt="<?= htmlspecialchars($item->product->name ?? 'Product'); ?>" 
                                                             class="rounded border object-fit-cover me-3"
                                                             style="width: 50px; height: 50px;"
@@ -163,7 +163,7 @@ $statusBadgeClass = match($status) {
                 <h4 class="fw-semibold">Order Not Found</h4>
                 <p class="text-muted mb-4">Please verify the URL parameters or select an order from your account history.</p>
                 <div>
-                    <a href="/customer/home.php" class="btn btn-primary px-4 rounded-pill">Return Home</a>
+                    <a href="/store-project/customer/home.php" class="btn btn-primary px-4 rounded-pill">Return Home</a>
                 </div>
             </div>
         <?php } ?>

@@ -8,14 +8,14 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!isset($_SESSION['user'])) {
-    header("Location: /auth/login.php");
+    header("Location: /store-project/auth/login.php");
     exit();
 }
 
 $user = User::find($_SESSION['user']['id']) ?? null;
 if (!$user) {
     unset($_SESSION['user']);
-    header("Location: /auth/login.php");
+    header("Location: /store-project/auth/login.php");
     exit();
 }
 
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="col-lg-8">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="fw-bold m-0">Edit Profile</h2>
-                    <a href="/admin/profile.php" class="btn btn-outline-secondary rounded-pill px-4">
+                    <a href="/store-project/admin/profile.php" class="btn btn-outline-secondary rounded-pill px-4">
                         &larr; Back to Profile
                     </a>
                 </div>
@@ -186,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
 
                         <div class="d-flex justify-content-end gap-2 pt-2">
-                            <a href="/admin/profile.php" class="btn btn-light rounded-pill px-4">Cancel</a>
+                            <a href="/store-project/admin/profile.php" class="btn btn-light rounded-pill px-4">Cancel</a>
                             <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold">Save Changes</button>
                         </div>
 

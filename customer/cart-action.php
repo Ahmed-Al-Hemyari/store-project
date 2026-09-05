@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     }
     
-    $referer = $_SERVER['HTTP_REFERER'] ?? '/customer/cart.php';
+    $referer = $_SERVER['HTTP_REFERER'] ?? '/store-project/customer/cart.php';
     header("Location: " . $referer);
     exit();
 }

@@ -17,10 +17,10 @@ function render_footer(): void {
             <div class="col-md-4 mb-4 text-center">
                 <h5 class="fw-bold">Quick Links</h5>
                 <ul class="list-unstyled">
-                    <li><a href="/customer/home.php" class="text-white text-decoration-none">Home</a></li>
-                    <li><a href="/customer/products.php" class="text-white text-decoration-none">Shop</a></li>
-                    <li><a href="/customer/about.php" class="text-white text-decoration-none">About</a></li>
-                    <li><a href="/customer/contact.php" class="text-white text-decoration-none">Contact</a></li>
+                    <li><a href="/store-project/customer/home.php" class="text-white text-decoration-none">Home</a></li>
+                    <li><a href="/store-project/customer/products.php" class="text-white text-decoration-none">Shop</a></li>
+                    <li><a href="/store-project/customer/about.php" class="text-white text-decoration-none">About</a></li>
+                    <li><a href="/store-project/customer/contact.php" class="text-white text-decoration-none">Contact</a></li>
                 </ul>
             </div>
 

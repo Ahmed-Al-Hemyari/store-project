@@ -88,9 +88,9 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `description`, `price`, `image`, `stock`, `created_at`) VALUES
-(1, 'Wireless Ergonomic Mouse', 'High-precision wireless optical mouse with ergonomic design.', 29.99, '/images/mouse.jpg', 50, '2026-09-03 19:14:00'),
-(2, 'Mechanical Gaming Keyboard', 'RGB backlit mechanical keyboard with tactile blue switches.', 79.99, '/images/keyboard.jpg', 30, '2026-09-03 19:14:00'),
-(3, '27-Inch 4K Monitor', 'Ultra HD LED monitor with high color accuracy.', 349.5, '/images/monitor.jpg', 15, '2026-09-03 19:14:00');
+(1, 'Wireless Ergonomic Mouse', 'High-precision wireless optical mouse with ergonomic design.', 29.99, '/store-project/images/mouse.jpg', 50, '2026-09-03 19:14:00'),
+(2, 'Mechanical Gaming Keyboard', 'RGB backlit mechanical keyboard with tactile blue switches.', 79.99, '/store-project/images/keyboard.jpg', 30, '2026-09-03 19:14:00'),
+(3, '27-Inch 4K Monitor', 'Ultra HD LED monitor with high color accuracy.', 349.5, '/store-project/images/monitor.jpg', 15, '2026-09-03 19:14:00');
 
 -- --------------------------------------------------------
 

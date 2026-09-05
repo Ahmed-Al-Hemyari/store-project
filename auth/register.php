@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         $user = User::create($name, $email, $phone, $password);
     
         if ($user) {
-            header("Location: /auth/login.php");
+            header("Location: /store-project/auth/login.php");
             exit();
         } else {
             $error = "Error creating account!";

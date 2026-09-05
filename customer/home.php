@@ -26,12 +26,12 @@ $products = Product::getAll();
 
     <!-- Hero -->
     <section class="page-hero text-white text-center" 
-        style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/images/background.jpg');"
+        style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/store-project/images/background.jpg');"
         >
         <div class="container">
             <h1 class="display-4 fw-bold">Welcome to OnlineStore</h1>
             <p class="lead">Everything you need, delivered to your door</p>
-            <a href="/customer/products.php" class="btn btn-warning btn-lg">Shop Now</a>
+            <a href="/store-project/customer/products.php" class="btn btn-warning btn-lg">Shop Now</a>
         </div>
     </section>
     
@@ -79,7 +79,7 @@ $products = Product::getAll();
             <div class="container">
                 <h2>Special Offer!</h2>
                 <p>Get up to 30% off on selected products</p>
-                <a href="/customer/products.php" class="btn btn-warning">Shop Deals</a>
+                <a href="/store-project/customer/products.php" class="btn btn-warning">Shop Deals</a>
             </div>
         </section>
         

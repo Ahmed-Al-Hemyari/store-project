@@ -7,7 +7,7 @@ function render_product_card(array $products, int $i) {
         <!-- Image Container with Aspect Ratio -->
         <div class="ratio ratio-4x3 bg-light overflow-hidden position-relative">
             <img 
-                src="<?= htmlspecialchars($products[$i]->image ?? '/images/default.png'); ?>" 
+                src="<?= htmlspecialchars($products[$i]->image ?? '/store-project/images/default.png'); ?>" 
                 class="card-img-top object-fit-cover w-100 h-100" 
                 alt="<?= htmlspecialchars($products[$i]->name); ?>" 
                 loading="lazy"
@@ -25,7 +25,7 @@ function render_product_card(array $products, int $i) {
                 </p>
             </div>
             
-            <a href="/customer/cart-action.php?action=add&id=<?= $products[$i]->id ?>" class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-medium">
+            <a href="/store-project/customer/cart-action.php?action=add&id=<?= $products[$i]->id ?>" class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-medium">
                 Add to Cart
             </a>
         </div>

@@ -6,14 +6,14 @@ require_once "./components/navbar.php";
 session_start();
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['admin'] == false) {
-    header("Location: /auth/login.php");
+    header("Location: /store-project/auth/login.php");
     exit();
 }
 
 $user = User::find($_SESSION['user']['id']) ?? null;
 if (!$user) {
     unset($_SESSION['user']);
-    header("Location: /auth/login.php");
+    header("Location: /store-project/auth/login.php");
     exit();
 }
 
@@ -44,7 +44,7 @@ if (!$user) {
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h6 class="text-uppercase text-muted fw-bold m-0 fs-7" style="letter-spacing: 0.5px;">Account Information</h6>
-                            <a href="/admin/edit-profile.php" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <a href="/store-project/admin/edit-profile.php" class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                 Edit
                             </a>
                         </div>

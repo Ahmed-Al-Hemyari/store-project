@@ -16,7 +16,7 @@ function submitOrder(): void {
 
     $order = Order::create($user->id);
     if (!$order) {
-        header("Location: /customer/cart.php");
+        header("Location: /store-project/customer/cart.php");
         exit();
     }
 
@@ -32,7 +32,7 @@ function submitOrder(): void {
 
     if (!$validProducts) {
         $order->delete();
-        header("Location: /customer/home.php");
+        header("Location: /store-project/customer/home.php");
         exit();
     }
 
@@ -43,19 +43,19 @@ function submitOrder(): void {
     }
 
     Cart::clear();
-    header("Location: /customer/order-page.php?id=" . $order->id);
+    header("Location: /store-project/customer/order-page.php?id=" . $order->id);
     exit();
 }
 
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
     if (!$user) {
         unset($_SESSION['user']);
-        header("Location: /auth/login.php");
+        header("Location: /store-project/auth/login.php");
         exit();
     }
 
     if (empty($cart['items'])) {
-        header("Location: /customer/cart.php");
+        header("Location: /store-project/customer/cart.php");
         exit();
     }
 
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
                 <h4 class="fw-semibold">Your cart is empty</h4>
                 <p class="text-muted mb-4">Looks like you haven't added anything to your cart yet.</p>
                 <div>
-                    <a href="/customer/products.php" class="btn btn-primary px-4 rounded-pill">Continue Shopping</a>
+                    <a href="/store-project/customer/products.php" class="btn btn-primary px-4 rounded-pill">Continue Shopping</a>
                 </div>
             </div>
         <?php } else { ?>
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
                                             <td class="ps-4">
                                                 <div class="d-flex align-items-center">
                                                     <img 
-                                                        src="<?= htmlspecialchars($item['product']->image ?? '/images/default.png'); ?>" 
+                                                        src="<?= htmlspecialchars($item['product']->image ?? '/store-project/images/default.png'); ?>" 
                                                         alt="<?= htmlspecialchars($item['product']->name); ?>" 
                                                         class="rounded border object-fit-cover me-3"
                                                         style="width: 60px; height: 60px;"
@@ -126,16 +126,16 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
                                             </td>
                                             <td>
                                                 <div class="d-flex align-items-center justify-content-center">
-                                                    <a href="/customer/cart-action.php?action=decrease&id=<?= $item['product']->id; ?>" class="btn btn-sm btn-outline-secondary rounded-circle px-2 py-0 fw-bold">-</a>
+                                                    <a href="/store-project/customer/cart-action.php?action=decrease&id=<?= $item['product']->id; ?>" class="btn btn-sm btn-outline-secondary rounded-circle px-2 py-0 fw-bold">-</a>
                                                     <span class="mx-3 fw-bold"><?= $item['quantity']; ?></span>
-                                                    <a href="/customer/cart-action.php?action=increase&id=<?= $item['product']->id; ?>" class="btn btn-sm btn-outline-secondary rounded-circle px-2 py-0 fw-bold">+</a>
+                                                    <a href="/store-project/customer/cart-action.php?action=increase&id=<?= $item['product']->id; ?>" class="btn btn-sm btn-outline-secondary rounded-circle px-2 py-0 fw-bold">+</a>
                                                 </div>
                                             </td>
                                             <td class="fw-bold text-primary">
                                                 $<?= number_format($item['subtotal'], 2); ?>
                                             </td>
                                             <td class="text-end pe-4">
-                                                <a href="/customer/cart-action.php?action=remove&id=<?= $item['product']->id; ?>" class="btn btn-sm btn-outline-gray border-0" title="Remove item">
+                                                <a href="/store-project/customer/cart-action.php?action=remove&id=<?= $item['product']->id; ?>" class="btn btn-sm btn-outline-gray border-0" title="Remove item">
                                                     🗑️
                                                 </a>
                                             </td>

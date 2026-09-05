@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $order->update(status: 'cancelled');
     }
 
-    $referer = $_SERVER['HTTP_REFERER'] ?? '/customer/cart.php';
+    $referer = $_SERVER['HTTP_REFERER'] ?? '/store-project/customer/cart.php';
     header("Location: " . $referer);
     exit();
 }

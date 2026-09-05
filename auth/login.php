@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
             $_SESSION['user']['phone'] = $user->phone;
             $_SESSION['user']['admin'] = (bool) $user->admin;
 
-            header("Location: /");
+            header("Location: /store-project/");
             exit();
         } else {
             $error = "Incorrect password!";

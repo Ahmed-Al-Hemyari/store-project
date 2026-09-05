@@ -6,16 +6,16 @@ $activePage = $props['active'] ?? '';
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="/customer/home.php">OnlineStore</a>
+        <a class="navbar-brand" href="/store-project/customer/home.php">OnlineStore</a>
         <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="nav">
             <ul class="navbar-nav ms-auto d-flex gap-4">
-                <li class="nav-item"><a class="nav-link <?= $activePage == 'users' ? 'active' : ''; ?>" href="/admin/users/users-table.php" id="users">Users</a></li>
-                <li class="nav-item"><a class="nav-link <?= $activePage == 'products' ? 'active' : ''; ?>" href="/admin/products/products-table.php" id="products">Products</a></li>
-                <li class="nav-item"><a class="btn btn-primary" href="/admin/profile.php">Profile</a></li>
-                <li class="nav-item"><a class="btn btn-danger" href="/auth/logout.php">Logout</a></li>
+                <li class="nav-item"><a class="nav-link <?= $activePage == 'users' ? 'active' : ''; ?>" href="/store-project/admin/users/users-table.php" id="users">Users</a></li>
+                <li class="nav-item"><a class="nav-link <?= $activePage == 'products' ? 'active' : ''; ?>" href="/store-project/admin/products/products-table.php" id="products">Products</a></li>
+                <li class="nav-item"><a class="btn btn-primary" href="/store-project/admin/profile.php">Profile</a></li>
+                <li class="nav-item"><a class="btn btn-danger" href="/store-project/auth/logout.php">Logout</a></li>
             </ul>
         </div>
     </div>

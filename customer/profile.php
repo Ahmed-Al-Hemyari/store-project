@@ -7,14 +7,14 @@ require_once "./components/order-card.php";
 session_start();
 
 if (!isset($_SESSION['user'])) {
-    header("Location: /auth/login.php");
+    header("Location: /store-project/auth/login.php");
     exit();
 }
 
 $user = User::find($_SESSION['user']['id']) ?? null;
 if (!$user) {
     unset($_SESSION['user']);
-    header("Location: /auth/login.php");
+    header("Location: /store-project/auth/login.php");
     exit();
 }
 
@@ -51,7 +51,7 @@ $orders = Order::getUserOrders();
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h6 class="text-uppercase text-muted fw-bold m-0 fs-7" style="letter-spacing: 0.5px;">Account Information</h6>
-                            <a href="/customer/edit-profile.php" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <a href="/store-project/customer/edit-profile.php" class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                 Edit
                             </a>
                         </div>
@@ -88,7 +88,7 @@ $orders = Order::getUserOrders();
                             </div>
                             <h6 class="fw-semibold">No orders placed yet</h6>
                             <p class="text-muted small mb-3">When you purchase products, your history will appear here.</p>
-                            <a href="/customer/products.php" class="btn btn-sm btn-primary rounded-pill px-4">Start Shopping</a>
+                            <a href="/store-project/customer/products.php" class="btn btn-sm btn-primary rounded-pill px-4">Start Shopping</a>
                         </div>
                     <?php else: ?>
                         <div class="accordion accordion-flush" id="ordersAccordion">
