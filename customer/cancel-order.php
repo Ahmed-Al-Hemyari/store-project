@@ -2,8 +2,8 @@
 
 require_once "../classes.php";
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $orderId = isset($_POST['order_id']) ? (int) $_POST['order_id'] : null;
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $orderId = isset($_GET['id']) ? (int) $_GET['id'] : null;
     $order = $orderId ? Order::find($orderId) : null;
 
     if ($order) {

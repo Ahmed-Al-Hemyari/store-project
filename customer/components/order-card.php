@@ -3,30 +3,39 @@
 function render_order_card($order) { 
     $status = strtolower($order->status ?? 'pending');
     $statusClass = match($status) {
-        'completed', 'delivered' => 'bg-success',
+        'completed' => 'bg-success',
         'cancelled' => 'bg-danger',
         'processing' => 'bg-info text-dark',
         default => 'bg-warning text-dark'
     };
-
 ?>
 <div class="accordion-item border rounded-3 mb-3 overflow-hidden shadow-sm">
-    <h2 class="accordion-header" id="heading<?= $order->id; ?>">
-        <button class="accordion-button collapsed bg-white py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= $order->id; ?>">
-            <div class="d-flex justify-content-between align-items-center w-100 me-3">
-                <div>
-                    <span class="fw-bold text-dark me-2">Order #<?= $order->id; ?></span>
-                    <span class="badge <?= $statusClass; ?> rounded-pill px-2 py-1 text-capitalize">
-                        <?= htmlspecialchars($order->status ?? 'Pending'); ?>
-                    </span>
-                </div>
-                <div class="text-end">
-                    <span class="fw-bold text-primary">$<?= number_format($order->totalPrice ?? 0, 2); ?></span>
-                    <small class="text-muted d-block fs-7"><?= $order->itemsCount ?? count($order->orderItems ?? []); ?> item(s)</small>
-                </div>
+    <div class="d-flex align-items-center bg-white py-3 px-3 border-bottom-0">
+        <!-- Main Card Body: Navigates to order details page -->
+        <a href="/customer/order-page.php?id=<?= $order->id; ?>" class="text-decoration-none d-flex justify-content-between align-items-center flex-grow-1 me-3">
+            <div>
+                <span class="fw-bold text-dark me-2">Order #<?= $order->id; ?></span>
+                <span class="badge <?= $statusClass; ?> rounded-pill px-2 py-1 text-capitalize">
+                    <?= htmlspecialchars($order->status ?? 'Pending'); ?>
+                </span>
             </div>
+            <div class="text-end">
+                <span class="fw-bold text-primary">$<?= number_format($order->totalPrice ?? 0, 2); ?></span>
+                <small class="text-muted d-block fs-7"><?= $order->itemsCount ?? count($order->orderItems ?? []); ?> item(s)</small>
+            </div>
+        </a>
+
+        <!-- Toggle Arrow: Expands accordion dropdown -->
+        <button class="btn btn-link p-0 text-muted shadow-none accordion-button collapsed flex-grow-0" 
+                type="button" 
+                data-bs-toggle="collapse" 
+                data-bs-target="#collapse<?= $order->id; ?>" 
+                aria-expanded="false" 
+                aria-controls="collapse<?= $order->id; ?>"
+                style="width: auto;">
         </button>
-    </h2>
+    </div>
+
     <div id="collapse<?= $order->id; ?>" class="accordion-collapse collapse" data-bs-parent="#ordersAccordion">
         <div class="accordion-body bg-light border-top">
             <h6 class="fw-semibold mb-3 small text-uppercase text-muted">Purchased Items</h6>
@@ -64,12 +73,9 @@ function render_order_card($order) {
             <!-- Cancel Order Action -->
             <?php if (in_array($status, ['pending'])): ?>
                 <div class="d-flex justify-content-end border-top pt-3">
-                    <form action="/customer/cancel-order.php" method="POST" onsubmit="return confirm('Are you sure you want to cancel Order #<?= $order->id; ?>?');">
-                        <input type="hidden" name="order_id" value="<?= $order->id; ?>">
-                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                            Cancel Order
-                        </button>
-                    </form>
+                    <a href="/customer/cancel-order.php?id=<?= $order->id ?>" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                        Cancel Order
+                    </a>
                 </div>
             <?php endif; ?>
 
