@@ -230,7 +230,7 @@ class Order {
         }
 
         global $connection;
-        $query = "INSERT INTO `order` (`user_id`, `status`) VALUES (:user_id, :status)";
+        $query = "INSERT INTO `orders` (`user_id`, `status`) VALUES (:user_id, :status)";
         $statement = $connection->prepare($query);
         $statement->execute([
             ':user_id' => $user->id,
@@ -463,5 +463,93 @@ class OrderItem {
         $query = "DELETE FROM `order_items` WHERE `id` = :id";
         $statement = $connection->prepare($query);
         return $statement->execute([':id' => $this->id]);
+    }
+}
+
+class Cart {
+    private static function initSession(): void {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        if (!isset($_SESSION['cart'])) {
+            $_SESSION['cart'] = [];
+        }
+    }
+
+    public static function add(int $productId, int $quantity = 1): void {
+        self::initSession();
+
+        if (isset($_SESSION['cart'][$productId])) {
+            $_SESSION['cart'][$productId] += $quantity;
+        } else {
+            $_SESSION['cart'][$productId] = $quantity;
+        }
+    }
+
+    public static function increaseQuantity(int $productId): void {
+        self::initSession();
+
+        if (isset($_SESSION['cart'][$productId])) {
+            $_SESSION['cart'][$productId]++;
+        }
+    }
+
+    public static function decreaseQuantity(int $productId): void {
+        self::initSession();
+
+        if (isset($_SESSION['cart'][$productId])) {
+            $_SESSION['cart'][$productId]--;
+
+            if ($_SESSION['cart'][$productId] <= 0) {
+                self::remove($productId);
+            }
+        }
+    }
+
+    public static function remove(int $productId): void {
+        self::initSession();
+        unset($_SESSION['cart'][$productId]);
+    }
+
+    public static function getItems(): array {
+        self::initSession();
+        $cartData = $_SESSION['cart'];
+
+        if (empty($cartData)) {
+            return ['items' => [], 'grandTotal' => 0.0, 'totalQuantity' => 0];
+        }
+
+        $items = [];
+        $grandTotal = 0.0;
+        $totalQuantity = 0;
+
+        foreach ($cartData as $productId => $quantity) {
+            $product = Product::find((int) $productId);
+
+            if ($product) {
+                $subtotal = $product->price * $quantity;
+                $grandTotal += $subtotal;
+                $totalQuantity += $quantity;
+
+                $items[] = [
+                    'product'  => $product,
+                    'quantity' => $quantity,
+                    'subtotal' => $subtotal
+                ];
+            } else {
+                self::remove($productId);
+            }
+        }
+
+        return [
+            'items'         => $items,
+            'grandTotal'    => $grandTotal,
+            'totalQuantity' => $totalQuantity
+        ];
+    }
+
+    public static function clear(): void {
+        self::initSession();
+        $_SESSION['cart'] = [];
     }
 }

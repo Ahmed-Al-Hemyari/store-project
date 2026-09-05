@@ -25,7 +25,7 @@ function render_product_card(array $products, int $i) {
                 </p>
             </div>
             
-            <a href="products/phones.html" class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-medium">
+            <a href="/customer/cart-action.php?action=add&id=<?= $products[$i]->id ?>" class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-medium">
                 Add to Cart
             </a>
         </div>
