@@ -67,8 +67,49 @@ class User {
         $user->name = $data['name'];
         $user->email = $data['email'];
         $user->phone = $data['phone'];
+        $user->password = $data['password'];
         $user->admin = (bool) $data['admin'];
         return $user;
+    }
+
+    public function update(?string $name = null, ?string $email = null, ?string $phone = null, ?string $currentPassword = null, ?string $newPassword = null) {
+        global $connection;
+        if (!$this->id) return false;
+
+        $name = $name ?? $this->name;
+        $email = $email ?? $this->email;
+        $phone = $phone ?? $this->phone;
+
+        if ($currentPassword && $newPassword) {
+            if (password_verify($currentPassword, $this->password)) {
+                $hashed_password = password_hash($newPassword, PASSWORD_DEFAULT);
+            }
+        }
+
+        $password = $hashed_password ?? $this->password;
+        
+        $query = "UPDATE `users` SET 
+            `id` = :id,
+            `name` = :name,
+            `email` = :email,
+            `phone` = :phone,
+            `password` = :password WHERE `id` = :id";
+        $statement = $connection->prepare($query);
+        $success = $statement->execute([
+            ':id' => $this->id,
+            ':name' => $name,
+            ':email' => $email,
+            ':phone' => $phone,
+            ':password' => $password,
+        ]);
+
+        if ($success) {
+            $this->name = $name;
+            $this->email = $email;
+            $this->phone = $phone;
+        }
+
+        return $success;
     }
 
     public static function findByEmail(string $email): ?User {

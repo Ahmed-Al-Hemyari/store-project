@@ -51,7 +51,7 @@ $orders = Order::getUserOrders();
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h6 class="text-uppercase text-muted fw-bold m-0 fs-7" style="letter-spacing: 0.5px;">Account Information</h6>
-                            <a href="/customer/profile-edit.php" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <a href="/customer/edit-profile.php" class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                 Edit
                             </a>
                         </div>
