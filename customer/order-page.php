@@ -1,7 +1,7 @@
 <?php
 
 require_once "../classes.php";
-require_once "../components/navbar.php";
+require_once "./components/navbar.php";
 
 session_start();
 

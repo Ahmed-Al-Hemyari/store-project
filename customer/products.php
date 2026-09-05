@@ -1,9 +1,9 @@
 <?php 
 
 require_once "../classes.php";
-require_once "../components/navbar.php";
-require_once "../components/footer.php";
-require_once "../components/product-card.php";
+require_once "./components/navbar.php";
+require_once "./components/footer.php";
+require_once "./components/product-card.php";
 
 session_start();
 
