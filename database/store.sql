@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Sep 03, 2026 at 06:34 PM
+-- Generation Time: Sep 05, 2026 at 04:22 PM
 -- Server version: 9.6.0
 -- PHP Version: 8.3.30
 
@@ -30,7 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `orders` (
   `id` int NOT NULL COMMENT 'Primary Key',
   `user_id` int NOT NULL,
-  `status` enum('pending','progress','completed') NOT NULL DEFAULT 'pending',
+  `status` enum('pending','processing','completed', 'cancelled') NOT NULL DEFAULT 'pending',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -40,7 +40,7 @@ CREATE TABLE `orders` (
 
 INSERT INTO `orders` (`id`, `user_id`, `status`, `created_at`) VALUES
 (1, 2, 'completed', '2026-09-03 19:15:00'),
-(2, 3, 'progress', '2026-09-03 19:16:00'),
+(2, 3, 'processing', '2026-09-03 19:16:00'),
 (3, 2, 'pending', '2026-09-03 19:17:00');
 
 -- --------------------------------------------------------
