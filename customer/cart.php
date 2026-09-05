@@ -163,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
                             <span class="fw-bold fs-5">Total</span>
                             <span class="fw-bold fs-5 text-primary">$<?= number_format($cart['grandTotal'], 2); ?></span>
                         </div>
-                        <form action="" method="post">
+                        <form action="" method="post" onsubmit="return confirm('Are you sure you want to submit this order?');">
                             <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill fw-semibold">
                                 Submit Order
                             </button>
