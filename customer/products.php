@@ -37,8 +37,8 @@ $products = Product::getAll();
                 <div class="row g-4">
 
                     <?php 
-                    $len = 4 > count($products) ? count($products) : 4;
-                    for ($i=0; $i < $len; $i++) {         
+                    
+                    for ($i=0; $i < count($products); $i++) {         
                         render_product_card($products, $i);
                     }
                     ?>
